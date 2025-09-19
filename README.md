@@ -1,6 +1,6 @@
 Magento Config Exporter
 
-Magento Config Exporter is a command-line tool that extracts selected Magento configuration values from the database and saves them as YAML files.
+Magento Config Exporter is a command-line tool that extracts selected Magento configuration values from the database and saves them as structured YAML files.
 
 It is designed for cases where you configure modules in the Magento Admin, then want to export those settings into version-controlled files for later reuse or import on another environment.
 
@@ -10,7 +10,15 @@ It is designed for cases where you configure modules in the Magento Admin, then 
 	•	Exports values using bin/magento config:show
 	•	Supports --scope and --scope-code (default, stores, websites)
 	•	Reads which config paths to export from a YAML file (paths.yaml)
-	•	Writes results into YAML with all keys and values consistently quoted
+	•	Writes results into YAML with structured metadata:
+
+scope: "stores"
+scope_code: "english"
+values:
+  "payment/mollie_methods_creditcard/title": "Kredit- oder Debitkarte"
+
+
+	•	All keys and values are consistently quoted
 	•	Default output directory:
 
 {magento-dir}/var/magento-config-exporter/
@@ -92,14 +100,13 @@ Short	Long	Description
 	•	stores-english.yaml
 	•	websites-germany.yaml
 
-All keys and values are quoted for safety and easier importing.
+Example output
 
-Example output:
-
-"default":
-  "payment/banktransfer/title": "Vorauskasse"
+scope: "stores"
+scope_code: "english"
+values:
   "payment/mollie_methods_creditcard/title": "Kredit- oder Debitkarte"
-  "payment/mollie_methods_paypal/sort_order": "5"
+  "payment/mollie_methods_creditcard/sort_order": "1"
 
 
 ⸻
@@ -135,7 +142,7 @@ magento-config-exporter paths.yaml -s websites -c germany -o ~/magento-configs
 🔮 Next Steps
 
 This exporter is the first half of a configuration workflow:
-	•	Use Magento Config Exporter to extract config values.
+	•	Use Magento Config Exporter to extract config values with full scope metadata.
 	•	Later, use a complementary Importer to apply those YAML files back into another Magento installation via bin/magento config:set.
 
 ⸻
