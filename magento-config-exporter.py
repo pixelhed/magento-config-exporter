@@ -126,10 +126,7 @@ def main():
     all_lines = run_command(" ".join(base_cmd), magento_dir, args.debug)
 
     # Collect results
-    export_data = {}
-    scope_name = args.scope_code if args.scope_code else args.scope
-    export_data[QuotedString(scope_name)] = {}
-
+    values = {}
     for line in all_lines:
         if " - " not in line:
             continue
@@ -140,7 +137,14 @@ def main():
         # Only include keys that start with one of the requested paths
         for path in paths:
             if key.startswith(path):
-                export_data[QuotedString(scope_name)][QuotedString(key)] = QuotedString(value)
+                values[QuotedString(key)] = QuotedString(value)
+
+    # Build structured export
+    export_data = {
+        "scope": QuotedString(args.scope),
+        "scope_code": QuotedString(args.scope_code) if args.scope_code else None,
+        "values": values,
+    }
 
     # Determine output directory (default to {magento-dir}/var/magento-config-exporter)
     if args.output_dir:
@@ -175,9 +179,9 @@ def main():
 
     # Write YAML
     with open(output_file, "w") as f:
-        yaml.dump(export_data, f, sort_keys=True, allow_unicode=True)
+        yaml.dump(export_data, f, sort_keys=False, allow_unicode=True)
 
-    info(f"Exported {len(export_data[scope_name])} values → {output_file}")
+    info(f"Exported {len(values)} values → {output_file}")
 
 
 if __name__ == "__main__":
